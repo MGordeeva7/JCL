@@ -1,0 +1,102 @@
+import java.io.*;
+import java.util.*;
+public class CL{
+static File file;
+static ArrayList<String> list=new ArrayList<String>();
+public static void main(String[] args)throws Exception{
+file=new File("C:\\cl\\");
+System.out.println("Wellcome to Java Comand Line!");
+System.out.println(file.getAbsolutePath());
+Net net=new Net();
+Scanner in=new Scanner(System.in);
+String line=null; 
+while(true){
+line=in.nextLine();
+if(line.equals("end")){
+System.out.println("Goodbye!");
+net.server.close();,
+break;
+}
+parse(line,false,null);
+}
+}
+static void parse(String line,boolean net,Connection com){
+boolean flag_1=false;
+boolean flag_2=true;
+Command comand=null;
+String lexema=null;
+String name=null;
+String request="";
+StringTokenizer tokenizer=new StringTokenizer(line);
+while(tokenizer.hasMoreTokens()){
+if(flag_1==flag_2){break;}
+for(int i=0;tokenizer.hasMoreTokens();i++){
+lexema=tokenizer.nextToken();
+if(i==0){
+name=lexema;
+comand=chooseCommand(name,net,com);
+continue;
+}
+if(lexema.equals("&&")){
+flag_1=false;
+break;
+}else if(lexema.equals("||")){
+flag_1=true;
+break;
+}
+request+=lexema+" ";
+}
+flag_2=comand.execute(request,net,com);
+request="";
+if(net){
+com.out.println(flag_2);
+}else{
+System.out.println(flag_2);
+}
+}
+}
+static Command chooseCommand(String name,boolean net,Connection com){
+FileInputStream fin;
+Properties config=new Properties();
+try{
+fin=new FileInputStream("Config.xml");
+config.loadFromXML(fin);
+}catch(IOException u){
+u.printStackTrace();
+}
+String classname=config.getProperty(name,"0");
+switch(classname){
+case "Cd":
+Cd a=new Cd();
+return a;
+case "Dir":
+Dir b=new Dir();
+return b;
+case "Pwd":
+Pwd c=new Pwd();
+return c;
+case "Jobs":
+Jobs d=new Jobs();
+return d;
+case "Write":
+Write e=new Write();
+return e;
+case "Who":
+Who f= new Who();
+return f;
+case "Cmd":
+Cmd g=new Cmd();
+return g;
+case "0":
+if(net){
+com.out.println("Sorry, but your command incorrect :(");
+}else{
+System.out.println("Sorry, but your command incorrect :(");
+}
+Command h=new Nothing();
+return h;
+}
+Command l=new Nothing();
+return l;
+}
+}
